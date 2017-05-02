@@ -180,6 +180,9 @@ type Client struct {
 	productIndexSet                     bool
 	promoIndex                          string
 	promoIndexSet                       bool
+	// Additional parameters for sending multiple custom dimension values
+	customDimensionMap    map[string]string
+	customDimensionMapSet bool
 }
 
 func (c *Client) setType(h hitType) {
@@ -439,6 +442,12 @@ func (h *Client) addFields(v url.Values) error {
 	}
 	if h.experimentVariantSet {
 		v.Add("xvar", h.experimentVariant)
+	}
+
+	if h.customDimensionMapSet {
+		for index, value := range h.customDimensionMap {
+			v.Add("cd"+index+"", value)
+		}
 	}
 	return nil
 }
@@ -1219,6 +1228,12 @@ func (h *Client) ProductIndex(productIndex string) *Client {
 func (h *Client) PromoIndex(promoIndex string) *Client {
 	h.promoIndex = promoIndex
 	h.promoIndexSet = true
+	return h
+}
+
+func (h *Client) CustomDimensionMap(customDimensionMap map[string]string) *Client {
+	h.customDimensionMap = customDimensionMap
+	h.customDimensionMapSet = true
 	return h
 }
 

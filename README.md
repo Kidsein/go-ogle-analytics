@@ -1,3 +1,7 @@
+## Version 1.0b
+
+This repository is forked from https://github.com/jpillora/go-ogle-analytics 2 May 2017 and added additional parameters to support sending multiple custom dimensions (see branch v1.0b)
+
 ## Go-ogle Analytics
 
 Track and monitor your Go programs for free with Google Analytics

@@ -183,6 +183,8 @@ type Client struct {
 	// Additional parameters for sending multiple custom dimension values
 	customDimensionMap    map[string]string
 	customDimensionMapSet bool
+	currencyCode          string
+	currencyCodeSet       bool
 }
 
 func (c *Client) setType(h hitType) {
@@ -448,6 +450,9 @@ func (h *Client) addFields(v url.Values) error {
 		for index, value := range h.customDimensionMap {
 			v.Add("cd"+index+"", value)
 		}
+	}
+	if h.currencyCodeSet {
+		v.Add("cu", h.currencyCode)
 	}
 	return nil
 }
@@ -1231,9 +1236,22 @@ func (h *Client) PromoIndex(promoIndex string) *Client {
 	return h
 }
 
+// Each custom dimension has an associated index. There is
+// a maximum of 20 custom dimensions (200 for Premium accounts).
+// The dimension index must be a positive integer between 1
+// and 200, inclusive.
 func (h *Client) CustomDimensionMap(customDimensionMap map[string]string) *Client {
 	h.customDimensionMap = customDimensionMap
 	h.customDimensionMapSet = true
+	return h
+}
+
+// When present indicates the local currency for all transaction
+// currency values. Value should be a valid ISO 4217 currency
+// code.
+func (h *Client) CurrencyCode(currencyCode string) *Client {
+	h.currencyCode = currencyCode
+	h.currencyCodeSet = true
 	return h
 }
 

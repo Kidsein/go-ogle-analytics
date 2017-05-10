@@ -6,15 +6,25 @@ import "net/url"
 
 //Screenview Hit Type
 type Screenview struct {
+	screenName string
 }
 
 // NewScreenview creates a new Screenview Hit Type.
-func NewScreenview() *Screenview {
-	h := &Screenview{}
+// This parameter is optional on web properties, and required
+// on mobile properties for screenview hits, where it is used
+// for the 'Screen Name' of the screenview hit. On web properties
+// this will default to the unique URL of the page by either
+// using the &dl parameter as-is or assembling it from &dh
+// and &dp.
+func NewScreenview(screenName string) *Screenview {
+	h := &Screenview{
+		screenName: screenName,
+	}
 	return h
 }
 
 func (h *Screenview) addFields(v url.Values) error {
+	v.Add("cd", h.screenName)
 	return nil
 }
 

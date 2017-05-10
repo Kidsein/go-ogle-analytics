@@ -6,49 +6,47 @@ import "net/url"
 
 //Timing Hit Type
 type Timing struct {
-	userTimingCategory        string
-	userTimingCategorySet     bool
-	userTimingVariableName    string
-	userTimingVariableNameSet bool
-	userTimingTime            int64
-	userTimingTimeSet         bool
-	userTimingLabel           string
-	userTimingLabelSet        bool
-	pageLoadTime              int64
-	pageLoadTimeSet           bool
-	dNSTime                   int64
-	dNSTimeSet                bool
-	pageDownloadTime          int64
-	pageDownloadTimeSet       bool
-	redirectResponseTime      int64
-	redirectResponseTimeSet   bool
-	tCPConnectTime            int64
-	tCPConnectTimeSet         bool
-	serverResponseTime        int64
-	serverResponseTimeSet     bool
-	dOMInteractiveTime        int64
-	dOMInteractiveTimeSet     bool
-	contentLoadTime           int64
-	contentLoadTimeSet        bool
+	userTimingCategory      string
+	userTimingVariableName  string
+	userTimingTime          int64
+	userTimingLabel         string
+	userTimingLabelSet      bool
+	pageLoadTime            int64
+	pageLoadTimeSet         bool
+	dNSTime                 int64
+	dNSTimeSet              bool
+	pageDownloadTime        int64
+	pageDownloadTimeSet     bool
+	redirectResponseTime    int64
+	redirectResponseTimeSet bool
+	tCPConnectTime          int64
+	tCPConnectTimeSet       bool
+	serverResponseTime      int64
+	serverResponseTimeSet   bool
+	dOMInteractiveTime      int64
+	dOMInteractiveTimeSet   bool
+	contentLoadTime         int64
+	contentLoadTimeSet      bool
 }
 
 // NewTiming creates a new Timing Hit Type.
+// Specifies the user timing category.
+// Specifies the user timing variable.
+// Specifies the user timing value. The value is in milliseconds.
 
-func NewTiming() *Timing {
-	h := &Timing{}
+func NewTiming(userTimingCategory string, userTimingVariableName string, userTimingTime int64) *Timing {
+	h := &Timing{
+		userTimingCategory:     userTimingCategory,
+		userTimingVariableName: userTimingVariableName,
+		userTimingTime:         userTimingTime,
+	}
 	return h
 }
 
 func (h *Timing) addFields(v url.Values) error {
-	if h.userTimingCategorySet {
-		v.Add("utc", h.userTimingCategory)
-	}
-	if h.userTimingVariableNameSet {
-		v.Add("utv", h.userTimingVariableName)
-	}
-	if h.userTimingTimeSet {
-		v.Add("utt", int2str(h.userTimingTime))
-	}
+	v.Add("utc", h.userTimingCategory)
+	v.Add("utv", h.userTimingVariableName)
+	v.Add("utt", int2str(h.userTimingTime))
 	if h.userTimingLabelSet {
 		v.Add("utl", h.userTimingLabel)
 	}
@@ -77,27 +75,6 @@ func (h *Timing) addFields(v url.Values) error {
 		v.Add("clt", int2str(h.contentLoadTime))
 	}
 	return nil
-}
-
-// Specifies the user timing category.
-func (h *Timing) UserTimingCategory(userTimingCategory string) *Timing {
-	h.userTimingCategory = userTimingCategory
-	h.userTimingCategorySet = true
-	return h
-}
-
-// Specifies the user timing variable.
-func (h *Timing) UserTimingVariableName(userTimingVariableName string) *Timing {
-	h.userTimingVariableName = userTimingVariableName
-	h.userTimingVariableNameSet = true
-	return h
-}
-
-// Specifies the user timing value. The value is in milliseconds.
-func (h *Timing) UserTimingTime(userTimingTime int64) *Timing {
-	h.userTimingTime = userTimingTime
-	h.userTimingTimeSet = true
-	return h
 }
 
 // Specifies the user timing label.

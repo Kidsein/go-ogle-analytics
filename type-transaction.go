@@ -6,17 +6,15 @@ import "net/url"
 
 //Transaction Hit Type
 type Transaction struct {
-	iD              string
-	affiliation     string
-	affiliationSet  bool
-	revenue         float64
-	revenueSet      bool
-	shipping        float64
-	shippingSet     bool
-	tax             float64
-	taxSet          bool
-	currencyCode    string
-	currencyCodeSet bool
+	iD             string
+	affiliation    string
+	affiliationSet bool
+	revenue        float64
+	revenueSet     bool
+	shipping       float64
+	shippingSet    bool
+	tax            float64
+	taxSet         bool
 }
 
 // NewTransaction creates a new Transaction Hit Type.
@@ -44,9 +42,6 @@ func (h *Transaction) addFields(v url.Values) error {
 	}
 	if h.taxSet {
 		v.Add("tt", float2str(h.tax))
-	}
-	if h.currencyCodeSet {
-		v.Add("cu", h.currencyCode)
 	}
 	return nil
 }
@@ -77,15 +72,6 @@ func (h *Transaction) Shipping(shipping float64) *Transaction {
 func (h *Transaction) Tax(tax float64) *Transaction {
 	h.tax = tax
 	h.taxSet = true
-	return h
-}
-
-// When present indicates the local currency for all transaction
-// currency values. Value should be a valid ISO 4217 currency
-// code.
-func (h *Transaction) CurrencyCode(currencyCode string) *Transaction {
-	h.currencyCode = currencyCode
-	h.currencyCodeSet = true
 	return h
 }
 

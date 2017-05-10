@@ -208,6 +208,8 @@ func goType(gaType string) string {
 		return "bool"
 	case "currency":
 		return "float64"
+	case "number":
+		return "int64"
 	}
 	log.Fatal("Unknown GA Type: " + gaType)
 	return ""
@@ -245,7 +247,7 @@ func check() {
 func parse() {
 
 	log.Println("reading: protocol.html")
-	b, _ := ioutil.ReadFile("generate/protocol-v1.html")
+	b, _ := ioutil.ReadFile("generate/protocol-v2.html")
 	r := bytes.NewReader(b)
 	doc, err := goquery.NewDocumentFromReader(r)
 
@@ -278,6 +280,9 @@ func parse() {
 
 		if f.Name == "Hit type" {
 			hitTypeDocs = f.Docs
+		}
+		if s.Find("a").Length() < 1 {
+			return
 		}
 		allFields = append(allFields, f)
 	})

@@ -6,18 +6,16 @@ import "net/url"
 
 //Item Hit Type
 type Item struct {
-	iD              string
-	name            string
-	price           float64
-	priceSet        bool
-	quantity        int64
-	quantitySet     bool
-	code            string
-	codeSet         bool
-	category        string
-	categorySet     bool
-	currencyCode    string
-	currencyCodeSet bool
+	iD          string
+	name        string
+	price       float64
+	priceSet    bool
+	quantity    int64
+	quantitySet bool
+	code        string
+	codeSet     bool
+	category    string
+	categorySet bool
 }
 
 // NewItem creates a new Item Hit Type.
@@ -49,9 +47,6 @@ func (h *Item) addFields(v url.Values) error {
 	if h.categorySet {
 		v.Add("iv", h.category)
 	}
-	if h.currencyCodeSet {
-		v.Add("cu", h.currencyCode)
-	}
 	return nil
 }
 
@@ -80,15 +75,6 @@ func (h *Item) Code(code string) *Item {
 func (h *Item) Category(category string) *Item {
 	h.category = category
 	h.categorySet = true
-	return h
-}
-
-// When present indicates the local currency for all transaction
-// currency values. Value should be a valid ISO 4217 currency
-// code.
-func (h *Item) CurrencyCode(currencyCode string) *Item {
-	h.currencyCode = currencyCode
-	h.currencyCodeSet = true
 	return h
 }
 

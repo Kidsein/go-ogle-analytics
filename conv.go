@@ -1,6 +1,9 @@
 package ga
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 func bool2str(val bool) string {
 	if val {
@@ -14,6 +17,10 @@ func int2str(val int64) string {
 	return fmt.Sprintf("%d", val)
 }
 
-func float2str(val float64) string {
+func currency2str(val float64) string {
 	return fmt.Sprintf("%.6f", val)
+}
+
+func number2str(val float64) string {
+	return strconv.FormatFloat(val, 'f', -1, 64)
 }

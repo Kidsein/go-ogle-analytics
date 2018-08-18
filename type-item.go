@@ -36,7 +36,7 @@ func (h *Item) addFields(v url.Values) error {
 	v.Add("ti", h.iD)
 	v.Add("in", h.name)
 	if h.priceSet {
-		v.Add("ip", float2str(h.price))
+		v.Add("ip", currency2str(h.price))
 	}
 	if h.quantitySet {
 		v.Add("iq", int2str(h.quantity))

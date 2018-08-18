@@ -35,13 +35,13 @@ func (h *Transaction) addFields(v url.Values) error {
 		v.Add("ta", h.affiliation)
 	}
 	if h.revenueSet {
-		v.Add("tr", float2str(h.revenue))
+		v.Add("tr", currency2str(h.revenue))
 	}
 	if h.shippingSet {
-		v.Add("ts", float2str(h.shipping))
+		v.Add("ts", currency2str(h.shipping))
 	}
 	if h.taxSet {
-		v.Add("tt", float2str(h.tax))
+		v.Add("tt", currency2str(h.tax))
 	}
 	return nil
 }

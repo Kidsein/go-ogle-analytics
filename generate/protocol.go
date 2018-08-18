@@ -35,7 +35,8 @@ type Field struct {
 	Docs,
 	Param,
 	ParamStr,
-	Type,
+	ValueType, // Type defined by Google
+	Type, // Converted type for use in Golang
 	Default,
 	MaxLen,
 	Examples string
@@ -67,10 +68,11 @@ func buildCode() string {
 	{{.PrivateName}}Set bool{{end}}
 {{end}}`
 
-	var paramVal = `{{if eq .Type "string"}}h.{{.PrivateName}}{{end}}` +
-		`{{if eq .Type "bool"}}bool2str(h.{{.PrivateName}}){{end}}` +
-		`{{if eq .Type "int64"}}int2str(h.{{.PrivateName}}){{end}}` +
-		`{{if eq .Type "float64"}}float2str(h.{{.PrivateName}}){{end}}`
+	var paramVal = `{{if eq .ValueType "text"}}h.{{.PrivateName}}{{end}}` +
+		`{{if eq .ValueType "boolean"}}bool2str(h.{{.PrivateName}}){{end}}` +
+		`{{if eq .ValueType "integer"}}int2str(h.{{.PrivateName}}){{end}}` +
+		`{{if eq .ValueType "currency"}}currency2str(h.{{.PrivateName}}){{end}}` +
+		`{{if eq .ValueType "number"}}number2str(h.{{.PrivateName}}){{end}}`
 
 	var params = `{{range $index, $element := .Fields}}{{if ne .Param ""}}{{if not .Required}}	if h.{{.PrivateName}}Set {
 {{end}}		v.Add({{.ParamStr}}, ` + paramVal + `){{if not .Required}}
@@ -268,15 +270,15 @@ func parse() {
 
 		//get trimmed raw contents
 		f := &Field{
-			Name:     trim(s.Find("a").Text()),
-			Required: !strings.Contains(content.Eq(0).Text(), "Optional"),
-			Docs:     trim(content.Eq(1).Text()),
-			Param:    trim(cells.Eq(0).Text()),
-			Type:     trim(cells.Eq(1).Text()),
-			Default:  trim(cells.Eq(2).Text()),
-			MaxLen:   trim(cells.Eq(3).Text()),
-			HitTypes: strings.Split(trim(cells.Eq(4).Text()), ", "),
-			Examples: trim(content.Eq(3).Text()),
+			Name:      trim(s.Find("a").Text()),
+			Required:  !strings.Contains(content.Eq(0).Text(), "Optional"),
+			Docs:      trim(content.Eq(1).Text()),
+			Param:     trim(cells.Eq(0).Text()),
+			ValueType: trim(cells.Eq(1).Text()),
+			Default:   trim(cells.Eq(2).Text()),
+			MaxLen:    trim(cells.Eq(3).Text()),
+			HitTypes:  strings.Split(trim(cells.Eq(4).Text()), ", "),
+			Examples:  trim(content.Eq(3).Text()),
 		}
 
 		if f.Name == "Hit type" {
@@ -360,7 +362,7 @@ func processField(f *Field) {
 	}
 
 	f.Docs = comment(trim(f.Docs))
-	f.Type = goType(f.Type)
+	f.Type = goType(f.ValueType)
 	f.ParamStr = `"` + f.Param + `"`
 
 	//check param for <extraVars>

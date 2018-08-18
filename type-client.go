@@ -340,7 +340,7 @@ func (h *Client) addFields(v url.Values) error {
 		v.Add("pr"+h.productIndex+"va", h.productVariant)
 	}
 	if h.productPriceSet {
-		v.Add("pr"+h.productIndex+"pr", float2str(h.productPrice))
+		v.Add("pr"+h.productIndex+"pr", currency2str(h.productPrice))
 	}
 	if h.productQuantitySet {
 		v.Add("pr"+h.productIndex+"qt", int2str(h.productQuantity))
@@ -367,13 +367,13 @@ func (h *Client) addFields(v url.Values) error {
 		v.Add("ta", h.affiliation)
 	}
 	if h.revenueSet {
-		v.Add("tr", float2str(h.revenue))
+		v.Add("tr", currency2str(h.revenue))
 	}
 	if h.taxSet {
-		v.Add("tt", float2str(h.tax))
+		v.Add("tt", currency2str(h.tax))
 	}
 	if h.shippingSet {
-		v.Add("ts", float2str(h.shipping))
+		v.Add("ts", currency2str(h.shipping))
 	}
 	if h.couponCodeSet {
 		v.Add("tcc", h.couponCode)
@@ -409,7 +409,7 @@ func (h *Client) addFields(v url.Values) error {
 		v.Add("il"+h.listIndex+"pi"+h.productIndex+"ps", int2str(h.productImpressionPosition))
 	}
 	if h.productImpressionPriceSet {
-		v.Add("il"+h.listIndex+"pi"+h.productIndex+"pr", float2str(h.productImpressionPrice))
+		v.Add("il"+h.listIndex+"pi"+h.productIndex+"pr", currency2str(h.productImpressionPrice))
 	}
 	if h.productImpressionCustomDimensionSet {
 		v.Add("il"+h.listIndex+"pi"+h.productIndex+"cd"+h.dimensionIndex+"", h.productImpressionCustomDimension)
@@ -439,7 +439,7 @@ func (h *Client) addFields(v url.Values) error {
 		v.Add("cd"+h.dimensionIndex+"", h.customDimension)
 	}
 	if h.customMetricSet {
-		v.Add("cm"+h.metricIndex+"", float2str(h.customMetric))
+		v.Add("cm"+h.metricIndex+"", number2str(h.customMetric))
 	}
 	if h.experimentIDSet {
 		v.Add("xid", h.experimentID)

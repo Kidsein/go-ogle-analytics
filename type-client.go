@@ -49,8 +49,8 @@ type Client struct {
 	campaignContentSet                  bool
 	campaignID                          string
 	campaignIDSet                       bool
-	googleAdWordsID                     string
-	googleAdWordsIDSet                  bool
+	googleAdsID                         string
+	googleAdsIDSet                      bool
 	googleDisplayAdsID                  string
 	googleDisplayAdsIDSet               bool
 	screenResolution                    string
@@ -78,8 +78,8 @@ type Client struct {
 	documentPathSet                     bool
 	documentTitle                       string
 	documentTitleSet                    bool
-	screenName                          string
-	screenNameSet                       bool
+	contentGroup                        string
+	contentGroupSet                     bool
 	linkID                              string
 	linkIDSet                           bool
 	applicationName                     string
@@ -162,9 +162,11 @@ type Client struct {
 	promotionPositionSet                bool
 	promotionAction                     string
 	promotionActionSet                  bool
+	currencyCode                        string
+	currencyCodeSet                     bool
 	customDimension                     string
 	customDimensionSet                  bool
-	customMetric                        int64
+	customMetric                        float64
 	customMetricSet                     bool
 	experimentID                        string
 	experimentIDSet                     bool
@@ -172,6 +174,8 @@ type Client struct {
 	experimentVariantSet                bool
 	dimensionIndex                      string
 	dimensionIndexSet                   bool
+	groupIndex                          string
+	groupIndexSet                       bool
 	listIndex                           string
 	listIndexSet                        bool
 	metricIndex                         string
@@ -259,8 +263,8 @@ func (h *Client) addFields(v url.Values) error {
 	if h.campaignIDSet {
 		v.Add("ci", h.campaignID)
 	}
-	if h.googleAdWordsIDSet {
-		v.Add("gclid", h.googleAdWordsID)
+	if h.googleAdsIDSet {
+		v.Add("gclid", h.googleAdsID)
 	}
 	if h.googleDisplayAdsIDSet {
 		v.Add("dclid", h.googleDisplayAdsID)
@@ -302,8 +306,8 @@ func (h *Client) addFields(v url.Values) error {
 	if h.documentTitleSet {
 		v.Add("dt", h.documentTitle)
 	}
-	if h.screenNameSet {
-		v.Add("cd", h.screenName)
+	if h.contentGroupSet {
+		v.Add("cg"+h.groupIndex+"", h.contentGroup)
 	}
 	if h.linkIDSet {
 		v.Add("linkid", h.linkID)
@@ -428,11 +432,14 @@ func (h *Client) addFields(v url.Values) error {
 	if h.promotionActionSet {
 		v.Add("promoa", h.promotionAction)
 	}
+	if h.currencyCodeSet {
+		v.Add("cu", h.currencyCode)
+	}
 	if h.customDimensionSet {
 		v.Add("cd"+h.dimensionIndex+"", h.customDimension)
 	}
 	if h.customMetricSet {
-		v.Add("cm"+h.metricIndex+"", int2str(h.customMetric))
+		v.Add("cm"+h.metricIndex+"", float2str(h.customMetric))
 	}
 	if h.experimentIDSet {
 		v.Add("xid", h.experimentID)
@@ -493,23 +500,26 @@ func (h *Client) CacheBuster(cacheBuster string) *Client {
 	return h
 }
 
-// This anonymously identifies a particular user, device, or
-// browser instance. For the web, this is generally stored
-// as a first-party cookie with a two-year expiration. For
-// mobile apps, this is randomly generated for each particular
-// instance of an application install. The value of this field
-// should be a random UUID (version 4) as described in http://www.ietf.org/rfc/rfc4122.txt
+// This field is required if User ID (uid) is not specified
+// in the request. This anonymously identifies a particular
+// user, device, or browser instance. For the web, this is
+// generally stored as a first-party cookie with a two-year
+// expiration. For mobile apps, this is randomly generated
+// for each particular instance of an application install.
+// The value of this field should be a random UUID (version
+// 4) as described in http://www.ietf.org/rfc/rfc4122.txt.
 func (h *Client) ClientID(clientID string) *Client {
 	h.clientID = clientID
 	h.clientIDSet = true
 	return h
 }
 
-// This is intended to be a known identifier for a user provided
-// by the site owner/tracking library user. It may not itself
-// be PII (personally identifiable information). The value
-// should never be persisted in GA cookies or other Analytics
-// provided storage.
+// This field is required if Client ID (cid) is not specified
+// in the request. This is intended to be a known identifier
+// for a user provided by the site owner/tracking library user.
+// It must not itself be PII (personally identifiable information).
+// The value should never be persisted in GA cookies or other
+// Analytics provided storage.
 func (h *Client) UserID(userID string) *Client {
 	h.userID = userID
 	h.userIDSet = true
@@ -608,10 +618,10 @@ func (h *Client) CampaignID(campaignID string) *Client {
 	return h
 }
 
-// Specifies the Google AdWords Id.
-func (h *Client) GoogleAdWordsID(googleAdWordsID string) *Client {
-	h.googleAdWordsID = googleAdWordsID
-	h.googleAdWordsIDSet = true
+// Specifies the Google Ads Id.
+func (h *Client) GoogleAdsID(googleAdsID string) *Client {
+	h.googleAdsID = googleAdsID
+	h.googleAdsIDSet = true
 	return h
 }
 
@@ -718,13 +728,16 @@ func (h *Client) DocumentTitle(documentTitle string) *Client {
 	return h
 }
 
-// If not specified, this will default to the unique URL of
-// the page by either using the &dl parameter as-is or assembling
-// it from &dh and &dp. App tracking makes use of this for
-// the 'Screen Name' of the screenview hit.
-func (h *Client) ScreenName(screenName string) *Client {
-	h.screenName = screenName
-	h.screenNameSet = true
+// You can have up to 5 content groupings, each of which has
+// an associated index between 1 and 5, inclusive. Each content
+// grouping can have up to 100 content groups. The value of
+// a content group is hierarchical text delimited by '/". All
+// leading and trailing slashes will be removed and any repeated
+// slashes will be reduced to a single slash. For example,
+// '/a//b/' will be converted to 'a/b'.
+func (h *Client) ContentGroup(contentGroup string) *Client {
+	h.contentGroup = contentGroup
+	h.contentGroupSet = true
 	return h
 }
 
@@ -737,7 +750,10 @@ func (h *Client) LinkID(linkID string) *Client {
 	return h
 }
 
-// Specifies the application name.
+// Specifies the application name. This field is required for
+// any hit that has app related data (i.e., app version, app
+// ID, or app installer ID). For hits sent to web properties,
+// this field is optional.
 func (h *Client) ApplicationName(applicationName string) *Client {
 	h.applicationName = applicationName
 	h.applicationNameSet = true
@@ -817,7 +833,7 @@ func (h *Client) ProductVariant(productVariant string) *Client {
 	return h
 }
 
-// The price of a product. Product index must be a positive
+// The unit price of a product. Product index must be a positive
 // integer between 1 and 200, inclusive. For analytics.js the
 // Enhanced Ecommerce plugin must be installed before using
 // this field.
@@ -1150,10 +1166,19 @@ func (h *Client) PromotionAction(promotionAction string) *Client {
 	return h
 }
 
+// When present indicates the local currency for all transaction
+// currency values. Value should be a valid ISO 4217 currency
+// code.
+func (h *Client) CurrencyCode(currencyCode string) *Client {
+	h.currencyCode = currencyCode
+	h.currencyCodeSet = true
+	return h
+}
+
 // Each custom dimension has an associated index. There is
-// a maximum of 20 custom dimensions (200 for Premium accounts).
-// The dimension index must be a positive integer between 1
-// and 200, inclusive.
+// a maximum of 20 custom dimensions (200 for Analytics 360
+// accounts). The dimension index must be a positive integer
+// between 1 and 200, inclusive.
 func (h *Client) CustomDimension(customDimension string) *Client {
 	h.customDimension = customDimension
 	h.customDimensionSet = true
@@ -1161,9 +1186,10 @@ func (h *Client) CustomDimension(customDimension string) *Client {
 }
 
 // Each custom metric has an associated index. There is a maximum
-// of 20 custom metrics (200 for Premium accounts). The metric
-// index must be a positive integer between 1 and 200, inclusive.
-func (h *Client) CustomMetric(customMetric int64) *Client {
+// of 20 custom metrics (200 for Analytics 360 accounts). The
+// metric index must be a positive integer between 1 and 200,
+// inclusive.
+func (h *Client) CustomMetric(customMetric float64) *Client {
 	h.customMetric = customMetric
 	h.customMetricSet = true
 	return h
@@ -1191,6 +1217,13 @@ func (h *Client) ExperimentVariant(experimentVariant string) *Client {
 func (h *Client) DimensionIndex(dimensionIndex string) *Client {
 	h.dimensionIndex = dimensionIndex
 	h.dimensionIndexSet = true
+	return h
+}
+
+// GroupIndex is required by other properties
+func (h *Client) GroupIndex(groupIndex string) *Client {
+	h.groupIndex = groupIndex
+	h.groupIndexSet = true
 	return h
 }
 

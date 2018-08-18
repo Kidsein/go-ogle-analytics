@@ -146,6 +146,7 @@ func grepper(restr string) func(string) string {
 	return func(s string) string {
 		matches := re.FindAllStringSubmatch(s, 1)
 		if len(matches) != 1 {
+			log.Printf("matches: %v, s: %v restr:%v\n", matches, s, restr)
 			log.Fatalf("'%s' should match '%s' exactly once", restr, s)
 		}
 		groups := matches[0]
@@ -207,6 +208,8 @@ func goType(gaType string) string {
 	case "boolean":
 		return "bool"
 	case "currency":
+		return "float64"
+	case "number":
 		return "float64"
 	}
 	log.Fatal("Unknown GA Type: " + gaType)
@@ -278,6 +281,10 @@ func parse() {
 
 		if f.Name == "Hit type" {
 			hitTypeDocs = f.Docs
+		}
+		// Exclude h3 headings in footer
+		if s.Find("a").Length() < 1 {
+			return
 		}
 		allFields = append(allFields, f)
 	})
